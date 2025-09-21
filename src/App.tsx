@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.js?url';
+import Tesseract from 'tesseract.js';
 import { FileText, AlertTriangle, CheckCircle, Clock, DollarSign, Scale, Target, Phone, Eye, ChevronDown, ChevronUp, Sparkles, Shield, Zap, BookOpen, ArrowRight } from 'lucide-react';
 import { analyzeDocument, validateApiKey, DocumentAnalysis } from './services/geminiService';
 import { ApiKeySetup } from './components/ApiKeySetup';
@@ -166,32 +169,49 @@ function App() {
   const [pdfLoading, setPdfLoading] = useState(false);
 
   // PDF parsing helper
-  async function handlePdfUpload(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     setPdfLoading(true);
     setError(null);
-    try {
-      // Use pdfjs-dist main entry
-      const pdfjsLib = await import('pdfjs-dist');
-      // Set workerSrc from CDN
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    if (file.type === 'application/pdf') {
+      // Use local worker for Vite compatibility
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const typedarray = new Uint8Array(e.target?.result as ArrayBuffer);
-        const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
-        let text = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          text += content.items.map((item: any) => item.str).join(' ') + '\n';
+        try {
+          const typedarray = new Uint8Array(e.target?.result as ArrayBuffer);
+          const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+          let text = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map((item: any) => item.str).join(' ') + '\n';
+          }
+          setDocumentText(text);
+        } catch (pdfErr) {
+          setError('PDF extraction failed: ' + (pdfErr instanceof Error ? pdfErr.message : String(pdfErr)));
+        } finally {
+          setPdfLoading(false);
         }
-        setDocumentText(text);
+      };
+      reader.onerror = () => {
+        setError('File reading failed.');
+        setPdfLoading(false);
       };
       reader.readAsArrayBuffer(file);
-    } catch (err) {
-      setError('Failed to parse PDF. Please try a different file.');
-    } finally {
+    } else if (file.type.startsWith('image/')) {
+      // OCR for images
+      try {
+        const { data } = await Tesseract.recognize(file, 'eng');
+        setDocumentText(data.text);
+      } catch (ocrErr) {
+        setError('OCR failed: ' + (ocrErr instanceof Error ? ocrErr.message : String(ocrErr)));
+      } finally {
+        setPdfLoading(false);
+      }
+    } else {
+      setError('Unsupported file type. Please upload a PDF or image.');
       setPdfLoading(false);
     }
   }
@@ -332,8 +352,8 @@ MAINTENANCE: Tenant shall be responsible for all repairs and maintenance under $
                 <div className="flex items-center space-x-4 mb-4">
                   <input
                     type="file"
-                    accept="application/pdf"
-                    onChange={handlePdfUpload}
+                    accept="application/pdf,image/*"
+                    onChange={handleFileUpload}
                     className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
                   {pdfLoading && <span className="text-blue-600">Parsing PDF...</span>}

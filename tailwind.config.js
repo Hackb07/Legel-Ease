@@ -5,20 +5,25 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Playfair Display', 'Georgia', 'serif'],
       },
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#1e3a8a',
-          700: '#1e40af',
-          800: '#1e3a8a',
-          900: '#1e3a8a',
+          50: '#f0f4f8',
+          100: '#d9e2ec',
+          200: '#bcccdc',
+          300: '#9fb3c8',
+          400: '#829ab1',
+          500: '#627d98',
+          600: '#486581',
+          700: '#334e68',
+          800: '#243b53', // Deep Navy
+          900: '#102a43', // Darkest Navy
         },
+        secondary: {
+          500: '#d4af37', // Gold
+          600: '#b4942b',
+        }
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

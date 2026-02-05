@@ -1,7 +1,6 @@
 # LegalEase AI - Technical Design Document
 
 ## 1. System Architecture
-## 1. System Architecture
 LegalEase AI utilizes a modern, hybrid architecture combining a responsive React frontend with a high-performance backend infrastructure. The system is designed for scalability and speed, leveraging proper separation of concerns.
 
 - **Frontend**: React + TypeScript (SPA) for the user interface.
@@ -60,20 +59,20 @@ A dedicated microservice built with Rust (using frameworks like Actix-web or Axu
 
 1.  **Input Phase**:
     - User selects a file.
-    - `handleFileUpload` triggered in `App.tsx`.
-    - If PDF: `pdfjs-dist` reads the file array buffer and extracts text strings from each page.
-    - If Image: `tesseract.js` processes the image and returns text.
-    - Extracted text is stored in `documentText` state.
+    - Frontend sends the raw file (PDF or Image) to the Go API Gateway.
 
-2.  **Analysis Phase**:
-    - User clicks "Analyze Document".
-    - `analyzeDocument` service is called with `documentText`.
-    - A specific prompt allows Gemini to return a JSON object.
-    - Response is parsed and stored in `analysis` state.
+2.  **Processing Phase**:
+    - Go Gateway validates the request and forwards the file to the **Rust Processing Service**.
+    - Rust Service parses the PDF/Image, extracts text using high-performance libraries, and returns clean text to Go Gateway.
 
-3.  **Visualization Phase**:
+3.  **Analysis Phase**:
+    - Go Gateway constructs the prompt and calls **Google Gemini API**.
+    - Gemini returns the JSON analysis.
+    - Go Gateway processes/sanitizes the JSON and sends it back to the Frontend.
+
+4.  **Visualization Phase**:
     - `activeTab` switches to 'analysis'.
-    - Components (`AnalysisSection`, `RiskBadge`, etc.) render the data from the `analysis` state object.
+    - Components render data received from the backend response.
 
 ## 4. UI/UX Design System
 - **Framework**: Tailwind CSS.
@@ -85,8 +84,9 @@ A dedicated microservice built with Rust (using frameworks like Actix-web or Axu
 - **Animations**: Subtle fade-ins and expansions for smoother transitions (using Tailwind utility classes).
 
 ## 5. Security & Privacy
-- **API Keys**: Stored in the user's browser (Local Storage or session) or environment variables. Not sent to any third-party backend other than Google.
-- **Document Data**: Processed in-memory. No file uploads to intermediate servers; direct text extraction in the browser.
+- **API Keys**: Managed securely on the Go backend; users authenticate via secure sessions.
+- **Data Transmission**: All analysis happens server-side. Documents are processed in-memory by the Rust/Go services and are not persisted to disk.
+- **Encryption**: TLS for all data in transit between Client, Backend, and AI Provider.
 
 ## 6. Future Considerations
 - **Export Options**: Ability to export the summary as PDF or Word.

@@ -21,7 +21,38 @@ You can **view or download the demo video** from this repository here:
 - **Plain English Summaries**: Get easy-to-understand explanations of legal terms and obligations.  
 - **Risk Assessment**: Identify and prioritize legal and financial risks.  
 - **Actionable Recommendations**: Receive negotiation points and questions to ask before signing.  
-- **Sample Document**: Try the app with a built-in sample lease agreement.  
+- **Sample Document**: Try the app with a built-in sample lease agreement.
+
+## 🏗 System Architecture
+
+LegalEase AI employs a high-performance hybrid architecture to ensure secure and efficient document processing:
+
+```mermaid
+graph TD
+    subgraph Frontend [Frontend Layer]
+        UI[React Client]
+    end
+
+    subgraph Backend [Backend Layer]
+        Go[Go API Gateway]
+        Rust[Rust Processing Service]
+    end
+
+    subgraph External [External Services]
+        Gemini[Google Gemini API]
+    end
+
+    User((User)) -->|1. Uploads Document| UI
+    UI -->|2. Sends File| Go
+    Go <-->|3. Parses Document| Rust
+    Go <-->|4. Get AI Analysis| Gemini
+    Go -->|5. Returns JSON Result| UI
+    UI -->|6. Shows Insights| User
+```
+
+- **Frontend**: React + TypeScript (SPA) for a responsive user interface.
+- **API Gateway (Go)**: Handles request orchestration, authentication, and business logic using Golang.
+- **Processing Engine (Rust)**: dedicated microservice using Rust for high-fidelity, high-performance structured data extraction (PDF/OCR).  
 
 
 ## 🚀 How to Use  
@@ -47,7 +78,12 @@ You can **view or download the demo video** from this repository here:
 
 ## 🛠 Development
 
-* Built with **React**, **TypeScript**, **Tailwind CSS**, and **Lucide React** icons.
+## 🛠 Development
+
+* **Frontend**: Built with **React**, **TypeScript**, **Tailwind CSS**, and **Lucide React** icons.
+* **Backend API**: **Go (Golang)** for robust API management and orchestration.
+* **Data Processing**: **Rust** for performance-critical document parsing and OCR tasks.
+* **AI Integration**: **Google Gemini** for advanced natural language understanding.
 * PDF parsing powered by [pdfjs-dist](https://github.com/mozilla/pdf.js).
 * Works with **Vite** for fast development and hot module replacement.
 
@@ -57,8 +93,12 @@ You can **view or download the demo video** from this repository here:
 
 ```
 LegalEase/
-├─ public/
-├─ src/
+├─ backend/
+│  ├─ api-gateway/ (Go)
+│  └─ processor/ (Rust)
+├─ frontend/
+│  ├─ public/
+│  ├─ src/
 │  ├─ components/
 │  ├─ pages/
 │  ├─ styles/

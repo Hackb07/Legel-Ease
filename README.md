@@ -5,17 +5,17 @@ LegalEase AI is a web application that transforms complex legal documents into c
 
 
 
-## 📹 Demo Video  
+##  Demo Video  
 GitHub does not support inline playback of `.mp4` files directly inside a README.  
 You can **view or download the demo video** from this repository here:  
 
-➡ [**explanation-hackathon.mp4**](https://github.com/Hackb07/Legel-Ease/blob/main/explanation-hackathon.mp4?raw=true)  
+ [**explanation-hackathon.mp4**](https://github.com/Hackb07/Legel-Ease/blob/main/explanation-hackathon.mp4?raw=true)  
 
 *(Clicking this link will either open or download the video, depending on your browser settings.)*
 
 
 
-## ✨ Features  
+##  Features  
 - **AI-Powered Legal Analysis**: Analyze legal documents with Google's Gemini AI.  
 - **PDF Upload**: Upload and parse PDF documents for instant analysis.  
 - **Plain English Summaries**: Get easy-to-understand explanations of legal terms and obligations.  
@@ -23,7 +23,7 @@ You can **view or download the demo video** from this repository here:
 - **Actionable Recommendations**: Receive negotiation points and questions to ask before signing.  
 - **Sample Document**: Try the app with a built-in sample lease agreement.
 
-## 🏗 System Architecture
+##  System Architecture
 
 LegalEase AI employs a high-performance hybrid architecture to ensure secure and efficient document processing:
 
